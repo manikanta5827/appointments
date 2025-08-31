@@ -6,12 +6,19 @@ const prisma = new PrismaClient();
 
 export const getProfile = async (req,res) => {
 
-    const userId = req.userId;
+    const username = req.params.username;
 
+    if(!username) {
+        return res.status(400).json({
+            status: "error",
+            message: "username is required"
+        })
+    }
+    
     // find the user using the id
     const user = await prisma.user.findUnique({
         where: {
-            id : userId
+            username : username
         }
     })
 
