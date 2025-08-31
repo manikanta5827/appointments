@@ -5,7 +5,7 @@ export const formatUserResponse = (userData) => {
         username:userData.username,
         email:userData.email,
         profilePic:userData.profilePic,
-        userType: userData.userType,
+        role: userData.role,
         emailVerified:userData.emailVerified,
         lastLogin:userData.lastLogin
     }

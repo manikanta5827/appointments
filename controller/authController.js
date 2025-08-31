@@ -14,6 +14,7 @@ export const createUser = async (req,res) => {
     let username = req.get('username');
     let email = req.get('email');
     let password = req.get('password');
+    let isProfessor = req.get('is_professor') || false;
 
     // validate the request body
     if(!username) {
@@ -81,7 +82,7 @@ export const createUser = async (req,res) => {
         });
     }
 
-    // validate if password contains at least one uppercase letter, one lowercase letter, one number, and one special character
+    // validate if password contains at least one uppercase letter, one lowercase letter, one number, one special character
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if(!passwordRegex.test(password)) {
         return res.status(400).json({
@@ -112,6 +113,14 @@ export const createUser = async (req,res) => {
             message: "Username should only contains letters",
         });
     }
+
+    // validate is professor field
+    if(typeof(isProfessor) != "boolean") {
+        return res.status(400).json({
+            status: "error",
+            message: "is_professor field should be true or false"
+        })
+    } 
     
     // hash the password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -122,6 +131,7 @@ export const createUser = async (req,res) => {
             username,
             email,
             password: hashedPassword,
+            role: isProfessor == true ? 'P' : 'U'
         },
     });
 
