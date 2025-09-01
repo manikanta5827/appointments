@@ -87,6 +87,7 @@ export const createAppointment = async (req,res) =>{
     await prisma.appointment.create({
         data: {
             studentId: user.id,
+            professorId,
             slotId : slot.id
         }
     })
@@ -96,5 +97,93 @@ export const createAppointment = async (req,res) =>{
     return res.status(201).json({
         status: "succuss",
         message: "Appointment is successfully created"
+    })
+}
+
+export const getAppointments = async (req,res) =>{
+    const userId = req.userId;
+
+    const user = await findUserById(userId);
+
+    let appointments = await prisma.appointment.findMany({
+        where: {
+            studentId: user.id,
+            status: 'booked'
+        },
+        select: {
+            slot: {
+                select: {
+                    id: true,
+                    slot: true
+                }
+            },
+            professor: {
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                    profilePic: true
+                }
+            }
+        }
+    });
+
+    return res.status(200).json({
+        status: "success",
+        message: "appointments fetched successfully",
+        data: appointments
+    });
+}
+
+export const cancelAppointment = async (req,res) => {
+    const userId = req.userId;
+    const appointmentId = req.get('appointment_id');
+
+    const professor = await findUserById(userId);
+
+    if(!appointmentId) {
+        return res.status(400).json({
+            status: "error",
+            message: "slot id is required"
+        })
+    }
+
+    // check if appointment id is integer
+    appointmentId = Number(appointmentId);
+    if(isNaN(appointmentId)) {
+        return res.status(400).json({
+            status: "error",
+            message: "appointment id should be a number"
+        })
+    }
+
+    // find if appointment exists
+    const appointment = await prisma.appointment.findFirst({
+        where:{
+            id: appointmentId,
+            professorId: professor.id
+        }
+    })
+
+    if(!appointment){
+        return res.status(400).json({
+            status: "error",
+            message: "Appointment doesn't exist"
+        })
+    }
+
+    // place status as cancelled in appointments table
+    await prisma.appointment.update({
+        where: {
+            id : appointmentId
+        },
+        data: {
+            status: 'cancelled'
+        }
+    })
+
+    return res.status(200).json({
+        status: "success",
+        message: "Appointment cancelled successfully"
     })
 }
