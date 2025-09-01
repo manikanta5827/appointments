@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./appointments.db"
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String    @unique
+  email         String    @unique
+  password      String
+  role          Role      @default(student)
+  profilePic    String?
+  emailVerified Boolean   @default(false)
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  slots                  Slot[]
+  studentAppointments    Appointment[] @relation("StudentAppointments")
+  professorAppointments  Appointment[] @relation("ProfessorAppointments")
+
+  @@index([email])
+}
+
+model Slot {
+  id          Int       @id @default(autoincrement())
+  professorId Int
+  slot        DateTime
+  isBooked    Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  appointments Appointment?
+  professor    User @relation(fields: [professorId], references: [id], onDelete: Cascade)
+
+  @@index([professorId])
+}
+
+model Appointment {
+  id          Int            @id @default(autoincrement())
+  studentId   Int
+  professorId Int
+  slotId      Int            @unique
+  status      BookingStatus  @default(booked)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  student   User @relation("StudentAppointments", fields: [studentId], references: [id], onDelete: Cascade)
+  professor User @relation("ProfessorAppointments", fields: [professorId], references: [id], onDelete: Cascade)
+  slot      Slot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([professorId])
+  @@index([slotId])
+}
+
+enum Role {
+  student
+  professor
+}
+
+enum BookingStatus {
+  booked
+  cancelled
+  completed
+}

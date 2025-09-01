@@ -6,6 +6,6 @@
 
 package-lock.json
 
-/prisma
+/prisma/migrations
 
 /logs
