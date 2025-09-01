@@ -7,5 +7,6 @@
 package-lock.json
 
 /prisma/migrations
+/prisma/appointments.db
 
 /logs
