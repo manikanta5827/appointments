@@ -2,7 +2,8 @@ import { logger } from '../utils/winstonLogger.js';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 import dotenv from "dotenv";
-import { generateAuthToken } from '../service/authTokenService.js';
+import { generateAuthToken } from '../service/authService.js';
+import { findUserByMail, findUserByName } from '../repository/userRepository.js';
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -41,17 +42,9 @@ export const createUser = async (req,res) => {
     }
 
     // check if the user already exists
-    const existingEmail = await prisma.user.findUnique({
-        where:{
-            email
-        }
-    })
+    const existingEmail = await findUserByMail(email);
 
-    const existingUsername = await prisma.user.findUnique({
-        where: {
-            username
-        }
-    })
+    const existingUsername = await findUserByName(username);
 
     if(existingUsername) {
         return res.status(400).json({
@@ -237,19 +230,10 @@ export const login = async (req, res) =>{
     let user = null;
     // If no username find the user using email
     if(!username) {
-        user = await prisma.user.findFirst({
-            where:{
-                email
-            }
-        })
+        user = await findUserByMail(email);
     }
     else {
-        user = await prisma.user.findFirst({
-            where:{
-                username
-
-            }
-        })
+        user = await findUserByName(username);
     }
 
     if(!user) {

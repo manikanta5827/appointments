@@ -1,12 +1,13 @@
 import {logger} from '../utils/winstonLogger.js';
 import { PrismaClient } from '@prisma/client';
-import { formatUserResponse } from '../service/userService.js';
+import { formatUser } from '../service/userService.js';
+import { findUserByName } from '../repository/userRepository.js';
 
 const prisma = new PrismaClient();
 
 export const getProfile = async (req,res) => {
 
-    const username = req.params.username;
+    const username = req.get('username');
 
     if(!username) {
         return res.status(400).json({
@@ -16,13 +17,8 @@ export const getProfile = async (req,res) => {
     }
     
     // find the user using the id
-    const user = await prisma.user.findUnique({
-        where: {
-            username : username
-        }
-    })
+    const user = await findUserByName(username);
 
-    logger.info(`user.lastLogin at ${user.lastLogin}`);
     // update login activity
     await prisma.user.update({
         where:{
@@ -33,6 +29,6 @@ export const getProfile = async (req,res) => {
         }
     })
 
-    const formattedData = formatUserResponse(user);
+    const formattedData = formatUser(user);
     res.status(200).json(formattedData)
 } 
