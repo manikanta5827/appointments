@@ -1,8 +1,9 @@
 import express from "express";
 import * as userController from '../controller/userController.js';
 import * as authController from "../controller/authController.js";
-import * as appointmentsController from "../controller/appointmentsController.js";
+import * as slotController from "../controller/slotController.js";
 import authHandler from "../middleware/authHandler.js";
+
 const router = express.Router();
 
 // auth routes
@@ -15,7 +16,8 @@ router.get('/user/profile/:username', userController.getProfile);
 
 
 // appointment api's
-router.post('/slot', authHandler, appointmentsController.createSlot);
-router.get('/slots', authHandler, appointmentsController.getAllSlots);
+router.post('/slot', authHandler, slotController.createSlot);
+router.get('/slots', slotController.getAllSlots);
+router.delete('/slot/:slotId', authHandler, slotController.deleteSlot);
 
 export default router;
