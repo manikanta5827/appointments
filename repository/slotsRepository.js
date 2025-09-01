@@ -6,8 +6,7 @@ const prisma = new PrismaClient();
 export const getSlotsOfProfessor = async (professorId) =>{
     const slots = await prisma.slot.findMany({
         where:{
-            professorId, 
-            isBooked: false
+            professorId
         },
         orderBy: {
             slot: 'asc'
