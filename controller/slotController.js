@@ -121,6 +121,7 @@ export const getAllSlots = async (req,res) =>{
     return res.status(200).json({
         status: "success",
         message: "professor slots fetched successfully",
+        pageSize: formattedSlots.length,
         data: formattedSlots
     })
 }

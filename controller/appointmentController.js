@@ -131,13 +131,14 @@ export const getAppointments = async (req,res) =>{
     return res.status(200).json({
         status: "success",
         message: "appointments fetched successfully",
+        pageSize: appointments.length,
         data: appointments
     });
 }
 
 export const cancelAppointment = async (req,res) => {
     const userId = req.userId;
-    const appointmentId = req.get('appointment_id');
+    let appointmentId = req.get('appointment_id');
 
     const professor = await findUserById(userId);
 
@@ -169,6 +170,13 @@ export const cancelAppointment = async (req,res) => {
         return res.status(400).json({
             status: "error",
             message: "Appointment doesn't exist"
+        })
+    }
+
+    if(appointment.status === 'cancelled') {
+        return res.status(200).json({
+            status: "success",
+            message: "Appointment cancelled successfully"
         })
     }
 
