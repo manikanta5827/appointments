@@ -200,7 +200,7 @@ export const verifyEmail = async (req, res) => {
         }
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
         status: "success",
         message: "Email verification successful"
     })
@@ -256,7 +256,7 @@ export const login = async (req, res) =>{
     // generate auth jwt token
     const authToken = generateAuthToken(user);
 
-    return res.status(200).json({
+    return res.status(201).json({
         status: "success",
         authToken: authToken
     })
