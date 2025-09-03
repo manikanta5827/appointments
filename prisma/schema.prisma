@@ -45,6 +45,7 @@ model Appointment {
   studentId   Int
   professorId Int
   slotId      Int            @unique
+  reason      String
   status      BookingStatus  @default(booked)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
@@ -66,5 +67,4 @@ enum Role {
 enum BookingStatus {
   booked
   cancelled
-  completed
 }
