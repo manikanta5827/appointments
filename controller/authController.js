@@ -105,7 +105,7 @@ export const createUser = async (req,res) => {
     if(!usernameRegex.test(username)) {
         return res.status(400).json({
             status: "error",
-            message: "Username should only contains letters",
+            message: "Username should only contains letters and numbers",
         });
     }
 
@@ -201,7 +201,7 @@ export const verifyEmail = async (req, res) => {
         }
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
         status: "success",
         message: "Email verification successful"
     })
@@ -257,7 +257,7 @@ export const login = async (req, res) =>{
     // generate auth jwt token
     const authToken = generateAuthToken(user);
 
-    return res.status(201).json({
+    return res.status(200).json({
         status: "success",
         authToken: authToken
     })

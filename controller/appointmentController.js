@@ -37,7 +37,7 @@ export const createAppointment = async (req,res) =>{
     if(!professorId) {
         return res.status(400).json({
             status: "error",
-            message: "slot id is required"
+            message: "professor id is required"
         })
     }
 
@@ -110,7 +110,7 @@ export const createAppointment = async (req,res) =>{
     // TODO :: send a mail to both student and professor that appointment is created btween both of them
 
     return res.status(201).json({
-        status: "succuss",
+        status: "success",
         message: "Appointment is successfully created"
     })
 }
@@ -136,7 +136,7 @@ export const getStudentAppointments = async (req,res) =>{
     let appointments = await prisma.appointment.findMany({
         where: {
             studentId: user.id,
-            status: 'booked'
+            status
         },
         select: {
             slot: {
@@ -168,7 +168,14 @@ export const getStudentAppointments = async (req,res) =>{
 
 export const getProfessorAppointments = async (req,res) => {
     const user = req.user;
+    const status = req.get('status') || 'booked';
 
+    if(!Object.values(AppointmentStatus).includes(status)) {
+        return res.status(400).json({
+            status: "error",
+            message: "status is not valid"
+        })
+    }
 
     if(user.role != UserRole.PROFESSOR) {
         return res.status(400).json({
@@ -180,7 +187,7 @@ export const getProfessorAppointments = async (req,res) => {
     let appointments = await prisma.appointment.findMany({
         where: {
             professorId: user.id,
-            status: 'booked'
+            status
         },
         select: {
             id: true,

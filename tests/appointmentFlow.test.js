@@ -2,15 +2,15 @@ import request from 'supertest';
 import express from 'express';
 import appRoutes from '../routes/appRoutes.js';
 
-// 1) Student A1 authenticates (create -> login)
-// 2) Professor P1 authenticates (create -> login)
+// 1) Student A1 authenticates
+// 2) Professor P1 authenticates
 // 3) Professor P1 creates free time slots T1, T2
 // 4) Student A1 views Professor P1 slots
 // 5) Student A1 books T1
-// 6) Student A2 authenticates (create -> login)
+// 6) Student A2 authenticates
 // 7) Student A2 books T2
 // 8) Professor P1 cancels appointment with Student A1
-// 9) Student A1 checks appointments -> none pending
+// 9) Student A1 checks appointments
 
 const app = express();
 app.use(express.json());
@@ -26,7 +26,7 @@ describe('Appointment Booking Flow', () => {
   let slotT2Id;
   let appointmentA1Id;
 
-  it('Student A1 authenticates (create -> login)', async () => {
+  it('Student A1 authenticates', async () => {
     const createRes = await request(app)
     .post('/user/create')
     .send({
@@ -45,7 +45,7 @@ describe('Appointment Booking Flow', () => {
     expect(studentA1Token).toBeDefined();
   });
 
-  it('Professor P1 authenticates (create -> login)', async () => {
+  it('Professor P1 authenticates', async () => {
     const createRes = await request(app)
       .post('/user/create')
       .send({
@@ -124,7 +124,7 @@ describe('Appointment Booking Flow', () => {
     expect(res.status).toBe(201);
   });
 
-  it('Student A2 authenticates (create -> login)', async () => {
+  it('Student A2 authenticates', async () => {
     const createRes = await request(app)
       .post('/user/create')
       .send({

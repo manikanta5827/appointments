@@ -11,7 +11,7 @@ const errorHandler = (err, req,res, next) => {
         let lineNumber = stackFrames[0].getLineNumber();
         let functionName = stackFrames[0].getFunctionName();
 
-        let logMessage = `[CRITICAL]: Error happened in file::${fileName} Line::${lineNumber} FunctioName::${functionName} Message::${errorMessage}`;
+        let logMessage = `[CRITICAL]: Error happened in file::${fileName} Line::${lineNumber} FunctionName::${functionName} Message::${errorMessage}`;
 
         logger.warn(logMessage);
     }
