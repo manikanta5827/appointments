@@ -1,6 +1,7 @@
 import { verifyAuthToken } from "../service/authService.js";
+import { findUserById } from "../repository/userRepository.js";
 
-const authHandler = (req,res,next) => {
+const authHandler = async(req,res,next) => {
     const authToken = req.headers['auth-token'];
 
     if(!authToken) {
@@ -20,7 +21,15 @@ const authHandler = (req,res,next) => {
     }
 
     // keep the user data in req body
-    req.userId = response.data.id;
+    const user = await findUserById(response.data.id);
+
+    if(!user) {
+        return res.status(404).json({
+            status: "error",
+            message: "user not found"
+        })
+    }
+    req.user = user;
     next();
 }
 

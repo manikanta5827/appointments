@@ -5,12 +5,10 @@ import { AppointmentStatus, UserRole } from "../enum/bookingStatusEnum.js";
 const prisma = new PrismaClient();
 
 export const createAppointment = async (req,res) =>{
-    const userId = req.userId;
+    const user = req.user;
     let professorId = req.get('professorId');
     let slotId = req.get('slotId');
     let reason = req.get('reason');
-
-    const user = await findUserById(userId);
 
     if(user.role != UserRole.STUDENT) {
         return res.status(403).json({
@@ -82,6 +80,14 @@ export const createAppointment = async (req,res) =>{
         })
     }
 
+    // check if slot is expired or not
+    if(slot.slot < new Date()) {
+        return res.status(400).json({
+            status: "error",
+            message: "slot is expired"
+        })
+    }
+
     // if slot is not booked then update the slot table and create a entry in appointments table
     await prisma.slot.update({
         where: {
@@ -110,7 +116,7 @@ export const createAppointment = async (req,res) =>{
 }
 
 export const getStudentAppointments = async (req,res) =>{
-    const userId = req.userId;
+    const user = req.user;
     const status = req.get('status') || 'booked';
 
     if(!Object.values(AppointmentStatus).includes(status)) {
@@ -119,8 +125,6 @@ export const getStudentAppointments = async (req,res) =>{
             message: "status is not valid"
         })
     }
-
-    const user = await findUserById(userId);
 
     if(user.role != UserRole.STUDENT) {
         return res.status(400).json({
@@ -163,9 +167,8 @@ export const getStudentAppointments = async (req,res) =>{
 }
 
 export const getProfessorAppointments = async (req,res) => {
-    const userId = req.userId;
+    const user = req.user;
 
-    const user = await findUserById(userId);
 
     if(user.role != UserRole.PROFESSOR) {
         return res.status(400).json({
@@ -208,10 +211,9 @@ export const getProfessorAppointments = async (req,res) => {
 }
 
 export const cancelAppointment = async (req,res) => {
-    const userId = req.userId;
+    const user = req.user;
     let appointmentId = req.get('appointment_id');
 
-    const professor = await findUserById(userId);
 
     if(!appointmentId) {
         return res.status(400).json({
@@ -233,7 +235,7 @@ export const cancelAppointment = async (req,res) => {
     const appointment = await prisma.appointment.findFirst({
         where:{
             id: appointmentId,
-            professorId: professor.id
+            professorId: user.id
         }
     })
 

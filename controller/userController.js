@@ -5,8 +5,7 @@ import { findUserByName } from '../repository/userRepository.js';
 const prisma = new PrismaClient();
 
 export const getProfile = async (req,res) => {
-
-    const username = req.get('username');
+  const username = req.get('username');
 
     if(!username) {
         return res.status(400).json({
@@ -17,6 +16,13 @@ export const getProfile = async (req,res) => {
     
     // find the user using the id
     const user = await findUserByName(username);
+
+    if(!user) {
+        return res.status(404).json({
+            status: "error",
+            message: "user not found"
+        })
+    }
 
     // update login activity
     await prisma.user.update({

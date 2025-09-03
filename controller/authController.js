@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { generateAuthToken } from '../service/authService.js';
 import { findUserByMail, findUserByName } from '../repository/userRepository.js';
 import { UserRole } from '../enum/bookingStatusEnum.js';
+import { formatUser } from '../service/userService.js';
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -120,7 +121,7 @@ export const createUser = async (req,res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     //create the user
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             username,
             email,
@@ -139,7 +140,8 @@ export const createUser = async (req,res) => {
 
     return res.status(201).json({
         status: "success",
-        message: "User created successfully"
+        message: "User created successfully",
+        user : formatUser(user)
     });
 }
 

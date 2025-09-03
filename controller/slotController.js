@@ -8,10 +8,7 @@ import { UserRole } from "../enum/bookingStatusEnum.js";
 const prisma = new PrismaClient();
 
 export const createSlot = async(req,res) =>{
-    const userId = req.userId;
-
-    // find the user using the id
-    const user = await findUserById(userId);
+    const user = req.user;
 
     // check if user is professor
     if(user.role != UserRole.PROFESSOR) {
@@ -128,13 +125,8 @@ export const getAllSlots = async (req,res) =>{
 
 export const deleteSlot = async (req,res) =>{
 
-    const userId = req.userId;
+    const user = req.user;
     let slotId = req.get('slotId');
-    logger.info(slotId);
-    logger.info(typeof(slotId));
-
-    // find the user using the id
-    const user = await findUserById(userId);
 
     // check if user is professor
     if(user.role != UserRole.PROFESSOR) {
