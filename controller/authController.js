@@ -100,8 +100,8 @@ export const createUser = async (req,res) => {
             message: "Username must be less than 20 characters long",
         });
     }
-    // validate username should only contains letters
-    const usernameRegex = /^[a-zA-Z]+$/;
+    // validate username should contain only letters and numbers
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
     if(!usernameRegex.test(username)) {
         return res.status(400).json({
             status: "error",

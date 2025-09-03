@@ -3,16 +3,11 @@ import logMiddleware from "./utils/winstonLogger.js";
 import errorHandler from "./middleware/errorHandler.js";
 import dotenv from 'dotenv';
 import appRoutes from "./routes/appRoutes.js";
-import reqStack from "./middleware/reqHandler.js"
 
-// setup
 const app = express();
 dotenv.config();
 
-//middlewares
-app.use(express.json());
 app.use(logMiddleware);
-app.use(reqStack);
 
 app.get('/', (req, res) => {
     res.send('Hello World');

@@ -4,8 +4,13 @@ import * as authController from "../controller/authController.js";
 import * as slotController from "../controller/slotController.js";
 import * as appointmentController from "../controller/appointmentController.js";
 import authHandler from "../middleware/authHandler.js";
+import reqStack from "../middleware/reqHandler.js";
 
 const router = express.Router();
+
+router.use(express.urlencoded({ extended: true }));
+router.use(express.json());
+router.use(reqStack);
 
 // auth routes
 router.post('/user/create', authController.createUser);
