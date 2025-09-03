@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const AUTH_SECRET=process.env.AUTH_SECRET;
-const AUTH_TOKEN_EXPIRES_IN = "24h"
+const AUTH_TOKEN_EXPIRES_IN = "100h"
 
 export const generateAuthToken = (user) => {
    return jwt.sign({ id: user.id }, AUTH_SECRET, { expiresIn: AUTH_TOKEN_EXPIRES_IN });
