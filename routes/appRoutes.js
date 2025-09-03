@@ -14,7 +14,6 @@ router.use(reqStack);
 
 // auth routes
 router.post('/user/create', authController.createUser);
-router.post('/user/verify', authController.verifyEmail);
 router.post('/user/login', authController.login);
 
 // user routes
