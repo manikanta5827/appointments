@@ -3,9 +3,9 @@ import { PrismaClient } from "@prisma/client";
 import { findUserById, findUserByName } from "../repository/userRepository.js";
 import { getSlotsOfProfessor } from "../repository/slotsRepository.js";
 import { formatSlots } from "../service/slotService.js";
+import { UserRole } from "../enum/bookingStatusEnum.js";
 
 const prisma = new PrismaClient();
-const USER_TYPE_PROFESSOR = 'professor';
 
 export const createSlot = async(req,res) =>{
     const userId = req.userId;
@@ -14,7 +14,7 @@ export const createSlot = async(req,res) =>{
     const user = await findUserById(userId);
 
     // check if user is professor
-    if(user.role != USER_TYPE_PROFESSOR) {
+    if(user.role != UserRole.PROFESSOR) {
         return res.status(403).json({
             status: "error",
             message: "you are not authorised to create a slot"
@@ -107,7 +107,7 @@ export const getAllSlots = async (req,res) =>{
         })
     }
 
-    if(professor.role != USER_TYPE_PROFESSOR) {
+    if(professor.role != UserRole.PROFESSOR) {
         return res.status(400).json({
             status: "error",
             message: "the name is not related to a professor"
@@ -128,16 +128,16 @@ export const getAllSlots = async (req,res) =>{
 
 export const deleteSlot = async (req,res) =>{
 
-    const professorId = req.userId;
+    const userId = req.userId;
     let slotId = req.get('slotId');
     logger.info(slotId);
     logger.info(typeof(slotId));
 
     // find the user using the id
-    const professor = await findUserById(professorId);
+    const user = await findUserById(userId);
 
     // check if user is professor
-    if(professor.role != USER_TYPE_PROFESSOR) {
+    if(user.role != UserRole.PROFESSOR) {
         return res.status(403).json({
             status: "error",
             message: "you are not authorised to delete a slot"
@@ -164,7 +164,7 @@ export const deleteSlot = async (req,res) =>{
     const slot = await prisma.slot.findFirst({
         where : {
             id: slotId,
-            professorId: professor.id
+            professorId: user.id
         }
     })
 

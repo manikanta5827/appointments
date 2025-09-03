@@ -1,17 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 import { findUserById } from "../repository/userRepository.js";
+import { AppointmentStatus, UserRole } from "../enum/bookingStatusEnum.js";
 
 const prisma = new PrismaClient();
-const USER_TYPE_STUDENT = "student";
 
 export const createAppointment = async (req,res) =>{
     const userId = req.userId;
     let professorId = req.get('professorId');
     let slotId = req.get('slotId');
+    let reason = req.get('reason');
 
     const user = await findUserById(userId);
 
-    if(user.role != USER_TYPE_STUDENT) {
+    if(user.role != UserRole.STUDENT) {
         return res.status(403).json({
             status: "error",
             message: "you are not authorised to create a appointment"
@@ -66,6 +67,13 @@ export const createAppointment = async (req,res) =>{
         })
     }
 
+    if(!reason || reason.length < 10) {
+        return res.status(400).json({
+            status: "error",
+            message: "reason shoudn't be empty and more than 10 characters"
+        })
+    }
+
     // if slot exists check if slot is available
     if(slot.isBooked == true) {
         return res.status(409).json({
@@ -88,7 +96,8 @@ export const createAppointment = async (req,res) =>{
         data: {
             studentId: user.id,
             professorId,
-            slotId : slot.id
+            slotId : slot.id,
+            reason
         }
     })
 
@@ -100,10 +109,25 @@ export const createAppointment = async (req,res) =>{
     })
 }
 
-export const getAppointments = async (req,res) =>{
+export const getStudentAppointments = async (req,res) =>{
     const userId = req.userId;
+    const status = req.get('status') || 'booked';
+
+    if(!Object.values(AppointmentStatus).includes(status)) {
+        return res.status(400).json({
+            status: "error",
+            message: "status is not valid"
+        })
+    }
 
     const user = await findUserById(userId);
+
+    if(user.role != UserRole.STUDENT) {
+        return res.status(400).json({
+            status: "error",
+            message: "this api is only for students to get the appointments"
+        })
+    }
 
     let appointments = await prisma.appointment.findMany({
         where: {
@@ -124,7 +148,54 @@ export const getAppointments = async (req,res) =>{
                     email: true,
                     profilePic: true
                 }
-            }
+            },
+            reason: true,
+            status: true
+        }
+    });
+
+    return res.status(200).json({
+        status: "success",
+        message: "appointments fetched successfully",
+        pageSize: appointments.length,
+        data: appointments
+    });
+}
+
+export const getProfessorAppointments = async (req,res) => {
+    const userId = req.userId;
+
+    const user = await findUserById(userId);
+
+    if(user.role != UserRole.PROFESSOR) {
+        return res.status(400).json({
+            status: "error",
+            message: "this api is only for professors to get the appointments"
+        })
+    }
+
+    let appointments = await prisma.appointment.findMany({
+        where: {
+            studentId: user.id,
+            status: 'booked'
+        },
+        select: {
+            slot: {
+                select: {
+                    id: true,
+                    slot: true
+                }
+            },
+            student: {
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                    profilePic: true
+                }
+            },
+            reason: true,
+            status: true
         }
     });
 

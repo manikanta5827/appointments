@@ -4,14 +4,13 @@ import { PrismaClient } from '@prisma/client';
 import dotenv from "dotenv";
 import { generateAuthToken } from '../service/authService.js';
 import { findUserByMail, findUserByName } from '../repository/userRepository.js';
+import { UserRole } from '../enum/bookingStatusEnum.js';
 
 dotenv.config();
 const prisma = new PrismaClient();
 const saltRounds = 10;
 const EMAIL_VERIFICATION_SECRET_CODE = process.env.EMAIL_VERIFICATION_SECRET_CODE;
-const EMAIL_VERIFICATION_EXPIRATION_TIME = 1000 * 60 * 10 // 10 MINS
-const USER_TYPE_PROFESSOR = "professor";
-const USER_TYPE_STUDENT = "student";
+const EMAIL_VERIFICATION_EXPIRATION_TIME = 1000 * 60 * 10
 
 export const createUser = async (req,res) => {
     let username = req.get('username');
@@ -126,7 +125,7 @@ export const createUser = async (req,res) => {
             username,
             email,
             password: hashedPassword,
-            role: isProfessor == true ? USER_TYPE_PROFESSOR : USER_TYPE_STUDENT
+            role: isProfessor == true ? UserRole.PROFESSOR : UserRole.STUDENT
         },
     });
 
