@@ -1,3 +1,6 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const getAllStudentAppointments = async (user, status) => {
     let appointments = await prisma.appointment.findMany({
