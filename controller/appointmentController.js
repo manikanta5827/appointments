@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { findUserById } from "../repository/userRepository.js";
 import { AppointmentStatus, UserRole } from "../enum/bookingStatusEnum.js";
+import { sendMail } from "../service/mailer.js";
 
 const prisma = new PrismaClient();
 
@@ -117,7 +118,7 @@ export const createAppointment = async (req,res) =>{
 
 export const getStudentAppointments = async (req,res) =>{
     const user = req.user;
-    const status = req.get('status') || 'booked';
+    const status = req.get('status') || AppointmentStatus.BOOKED;
 
     if(!Object.values(AppointmentStatus).includes(status)) {
         return res.status(400).json({
@@ -168,7 +169,7 @@ export const getStudentAppointments = async (req,res) =>{
 
 export const getProfessorAppointments = async (req,res) => {
     const user = req.user;
-    const status = req.get('status') || 'booked';
+    const status = req.get('status') || AppointmentStatus.BOOKED;
 
     if(!Object.values(AppointmentStatus).includes(status)) {
         return res.status(400).json({
@@ -254,7 +255,7 @@ export const cancelAppointment = async (req,res) => {
         })
     }
 
-    if(appointment.status === 'cancelled') {
+    if(appointment.status === AppointmentStatus.CANCELLED) {
         return res.status(200).json({
             status: "success",
             message: "Appointment cancelled successfully"
@@ -267,9 +268,20 @@ export const cancelAppointment = async (req,res) => {
             id : appointmentId
         },
         data: {
-            status: 'cancelled'
+            status: AppointmentStatus.CANCELLED
         }
     })
+
+    // TODO :: make this async background task
+    let studentBookedAppointment = await findUserById(appointment.studentId);
+    let professorOfThisAppointment = await findUserById(appointment.professorId);
+    let slot = await prisma.slot.findUnique({where: {id: appointment.slotId}});
+    await sendMail(
+        studentBookedAppointment.email,
+        "Appointment cancelled",
+        "appointment_cancel",
+        {receiverName : studentBookedAppointment.username, slot: slot.slot,professor: professorOfThisAppointment.username }
+    );
 
     return res.status(200).json({
         status: "success",

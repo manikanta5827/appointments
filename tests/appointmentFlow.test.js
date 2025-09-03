@@ -31,7 +31,7 @@ describe('Appointment Booking Flow', () => {
     .post('/user/create')
     .send({
       username: 'StudentA1',
-      email: 'studenta1@test.com',
+      email: 'eldrago5827@gmail.com',
       password: 'Password123$',
       is_professor: false
     });
@@ -40,7 +40,7 @@ describe('Appointment Booking Flow', () => {
     const loginRes = await request(app)
       .post('/user/login')
       .send({ username: 'StudentA1', password: 'Password123$' });
-    expect(loginRes.status).toBe(201);
+    expect(loginRes.status).toBe(200);
     studentA1Token = loginRes.body.authToken;
     expect(studentA1Token).toBeDefined();
   });
@@ -50,7 +50,7 @@ describe('Appointment Booking Flow', () => {
       .post('/user/create')
       .send({
         username : "ProfessorP1",
-        email: 'professorp1@gmail.com',
+        email: 'postbox5827@gmail.com',
         password: 'Password123$',
         is_professor: true
       });
@@ -65,7 +65,7 @@ describe('Appointment Booking Flow', () => {
         username: 'ProfessorP1',
         password: 'Password123$'
       });
-    expect(loginRes.status).toBe(201);
+    expect(loginRes.status).toBe(200);
     professorP1Token = loginRes.body.authToken;
     expect(professorP1Token).toBeDefined();
   });
@@ -129,7 +129,7 @@ describe('Appointment Booking Flow', () => {
       .post('/user/create')
       .send({
         username: 'StudentA2',
-        email: 'studenta2@test.com',
+        email: 'thummurimanikanta7@gmail.com',
         password: 'Password123$',
         is_professor: false
       })
@@ -141,7 +141,7 @@ describe('Appointment Booking Flow', () => {
         username: 'StudentA2',
         password: 'Password123$'
       })
-    expect(loginRes.status).toBe(201);
+    expect(loginRes.status).toBe(200);
     studentA2Token = loginRes.body.authToken;
     expect(studentA2Token).toBeDefined();
   });
