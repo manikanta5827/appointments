@@ -179,10 +179,11 @@ export const getProfessorAppointments = async (req,res) => {
 
     let appointments = await prisma.appointment.findMany({
         where: {
-            studentId: user.id,
+            professorId: user.id,
             status: 'booked'
         },
         select: {
+            id: true,
             slot: {
                 select: {
                     id: true,

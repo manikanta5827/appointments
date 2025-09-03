@@ -24,6 +24,7 @@ router.delete('/slot/:slotId', authHandler, slotController.deleteSlot);
 // appointment api's
 router.post('/appointment', authHandler, appointmentController.createAppointment);
 router.get('/student/appointments', authHandler, appointmentController.getStudentAppointments);
+router.get('/professor/appointments', authHandler, appointmentController.getProfessorAppointments);
 router.patch('/appointment', authHandler, appointmentController.cancelAppointment);
 
 export default router;
