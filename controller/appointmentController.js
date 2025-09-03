@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { findUserById } from "../repository/userRepository.js";
 import { AppointmentStatus, UserRole } from "../enum/bookingStatusEnum.js";
 import { sendMail } from "../service/mailer.js";
+import { findAppointmentUsingId, getAllProfessorAppointments, getAllStudentAppointments } from "../repository/appointmentRepository.js";
 
 const prisma = new PrismaClient();
 
@@ -134,30 +134,7 @@ export const getStudentAppointments = async (req,res) =>{
         })
     }
 
-    let appointments = await prisma.appointment.findMany({
-        where: {
-            studentId: user.id,
-            status
-        },
-        select: {
-            slot: {
-                select: {
-                    id: true,
-                    slot: true
-                }
-            },
-            professor: {
-                select: {
-                    id: true,
-                    username: true,
-                    email: true,
-                    profilePic: true
-                }
-            },
-            reason: true,
-            status: true
-        }
-    });
+    const appointments = await getAllStudentAppointments(user, status)
 
     return res.status(200).json({
         status: "success",
@@ -185,31 +162,7 @@ export const getProfessorAppointments = async (req,res) => {
         })
     }
 
-    let appointments = await prisma.appointment.findMany({
-        where: {
-            professorId: user.id,
-            status
-        },
-        select: {
-            id: true,
-            slot: {
-                select: {
-                    id: true,
-                    slot: true
-                }
-            },
-            student: {
-                select: {
-                    id: true,
-                    username: true,
-                    email: true,
-                    profilePic: true
-                }
-            },
-            reason: true,
-            status: true
-        }
-    });
+    const appointments = await getAllProfessorAppointments(user, status);
 
     return res.status(200).json({
         status: "success",
@@ -241,12 +194,7 @@ export const cancelAppointment = async (req,res) => {
     }
 
     // find if appointment exists
-    const appointment = await prisma.appointment.findFirst({
-        where:{
-            id: appointmentId,
-            professorId: user.id
-        }
-    })
+    const appointment = await findAppointmentUsingId(appointmentId, user);
 
     if(!appointment){
         return res.status(400).json({
@@ -273,14 +221,11 @@ export const cancelAppointment = async (req,res) => {
     })
 
     // TODO :: make this async background task
-    let studentBookedAppointment = await findUserById(appointment.studentId);
-    let professorOfThisAppointment = await findUserById(appointment.professorId);
-    let slot = await prisma.slot.findUnique({where: {id: appointment.slotId}});
     await sendMail(
-        studentBookedAppointment.email,
+        appointment.student.email,
         "Appointment cancelled",
         "appointment_cancel",
-        {receiverName : studentBookedAppointment.username, slot: slot.slot,professor: professorOfThisAppointment.username }
+        {receiverName : appointment.student.username, slot: appointment.slot.slot, professor: appointment.professor.username }
     );
 
     return res.status(200).json({
