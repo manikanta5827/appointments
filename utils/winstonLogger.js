@@ -32,7 +32,6 @@ const logger = createLogger({
   ],
 });
 
-// Middleware function
 const logMiddleware = (req, res, next) => {
     const startHrTime = process.hrtime();
 
