@@ -19,6 +19,12 @@ try {
     stdio: 'inherit',
     env: { ...process.env }
   });
+
+  execSync('npx prisma migrate reset --force', {
+    cwd: join(__dirname, '..'),
+    stdio: 'inherit',
+    env: { ...process.env }
+  });
   process.exit(0);
 } catch (error) {
   process.exit(typeof error.status === 'number' ? error.status : 1);
