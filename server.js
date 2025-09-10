@@ -7,6 +7,7 @@ import appRoutes from "./routes/appRoutes.js";
 const app = express();
 dotenv.config();
 
+app.use(express.json());
 app.use(logMiddleware);
 
 app.get('/', (req, res) => {
