@@ -27,13 +27,13 @@ model User {
 
 model Slot {
   id          Int       @id @default(autoincrement())
-  professorId Int
   slot        DateTime
   isBooked    Boolean    @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  professorId Int
 
-  appointments Appointment?
+  appointment Appointment?
   professor    User @relation(fields: [professorId], references: [id], onDelete: Cascade)
 
   @@index([professorId])
@@ -41,13 +41,13 @@ model Slot {
 
 model Appointment {
   id          Int            @id @default(autoincrement())
-  studentId   Int
-  professorId Int
-  slotId      Int            @unique
   reason      String
   status      BookingStatus  @default(booked)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  studentId   Int
+  professorId Int
+  slotId      Int            @unique
 
   student   User @relation("StudentAppointments", fields: [studentId], references: [id], onDelete: Cascade)
   professor User @relation("ProfessorAppointments", fields: [professorId], references: [id], onDelete: Cascade)
